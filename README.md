@@ -22,12 +22,12 @@ cargo 3pl > THIRD-PARTY-LICENSES.txt
 
 ## How It Works
 
-This project creates a summary of your dependency licenses from their `license` entry in `Cargo.toml`. It then looks for their license files with:
+This project creates a summary of your dependency licenses from their `license` entry in `Cargo.toml`. It then tries to find their license files. It looks for:
 
 - filenames that contain `LICENSE`, `LICENCE`, `NOTICE`, or `COPYING` (case-insensitive)
 - `txt`, `md`, or no extension (case-insensitive)
 
-It does not include dependencies in the current workspace.
+Dependencies in the current workspace are not included.
 
 ## Options
 
