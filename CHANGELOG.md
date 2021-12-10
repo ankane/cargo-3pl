@@ -1,4 +1,4 @@
-## 0.1.1 (unreleased)
+## 0.1.1 (2021-12-10)
 
 - Changed no `license` field from error to warning
 - Added `license-file` field file when not already included
