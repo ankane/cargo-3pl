@@ -41,7 +41,7 @@ struct Opt {
     // cargo passes 3pl
     // this approach allows cargo-3pl 3pl but that's fine
     #[structopt(hidden = true, possible_values = &["3pl"])]
-    cmd: Option<String>,
+    _cmd: Option<String>,
 }
 
 fn license_filename(filename: &str) -> bool {
