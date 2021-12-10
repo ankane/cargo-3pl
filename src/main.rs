@@ -101,6 +101,10 @@ fn get_metadata(opt: &Opt) -> Result<Value, Box<dyn Error>> {
     }
     let output = cmd.output()?;
 
+    if !output.status.success() {
+        return Err("cargo metadata failed".into());
+    }
+
     Ok(serde_json::from_slice(&output.stdout)?)
 }
 
