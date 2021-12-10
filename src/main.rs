@@ -151,7 +151,9 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
         if let Some(url) = &package.url {
             println!("{}", url);
         }
-        println!("{}", package.license.as_ref().unwrap());
+        if let Some(license) = &package.license {
+            println!("{}", license);
+        }
         println!();
     }
 
@@ -179,7 +181,7 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     for package in &packages {
         if package.license.is_none() {
-            return Err(format!("No license: {}", package.name).into());
+            warn(format!("No license field: {}", package.name));
         }
     }
 
