@@ -125,6 +125,12 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
         let mut license_paths = Vec::new();
         let path = manifest_path.parent().unwrap().to_path_buf();
         find_license_files(&mut license_paths, &path);
+        if let Some(license_file) = package["license_file"].as_str() {
+            let license_path = path.join(license_file);
+            if !license_paths.contains(&license_path) {
+                license_paths.push(license_path);
+            }
+        }
         license_paths.sort_unstable();
 
         packages.push(Package {
