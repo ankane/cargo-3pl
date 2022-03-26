@@ -1,4 +1,4 @@
-use clap::{AppSettings, ColorChoice, Parser};
+use clap::{ColorChoice, Parser};
 use serde_json::Value;
 use std::error::Error;
 use std::ffi::OsStr;
@@ -24,7 +24,6 @@ enum Color {
 // try to match output of other cargo commands
 #[derive(Debug, Parser)]
 #[clap(name = "cargo-3pl", about, override_usage = "cargo 3pl [OPTIONS]", version, color = ColorChoice::Never)]
-#[clap(global_setting(AppSettings::DeriveDisplayOrder))]
 struct Opt {
     /// Space or comma separated list of features to activate
     #[clap(long, value_name = "FEATURES")]
