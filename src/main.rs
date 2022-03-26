@@ -1,3 +1,4 @@
+use clap::{AppSettings, ColorChoice, Parser};
 use serde_json::Value;
 use std::error::Error;
 use std::ffi::OsStr;
@@ -5,8 +6,6 @@ use std::fs::{self, File};
 use std::io;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command};
-use structopt::clap::AppSettings;
-use structopt::StructOpt;
 
 struct Package {
     name: String,
@@ -23,24 +22,25 @@ enum Color {
 }
 
 // try to match output of other cargo commands
-#[derive(Debug, StructOpt)]
-#[structopt(name = "cargo-3pl", about, usage = "cargo 3pl [OPTIONS]", global_settings = &[AppSettings::UnifiedHelpMessage])]
+#[derive(Debug, Parser)]
+#[clap(name = "cargo-3pl", about, override_usage = "cargo 3pl [OPTIONS]", version, color = ColorChoice::Never)]
+#[clap(global_setting(AppSettings::DeriveDisplayOrder))]
 struct Opt {
     /// Space or comma separated list of features to activate
-    #[structopt(long, value_name = "FEATURES")]
+    #[clap(long, value_name = "FEATURES")]
     features: Vec<String>,
 
     /// Activate all available features
-    #[structopt(long)]
+    #[clap(long)]
     all_features: bool,
 
     /// Do not activate the `default` feature
-    #[structopt(long)]
+    #[clap(long)]
     no_default_features: bool,
 
     // cargo passes 3pl
     // this approach allows cargo-3pl 3pl but that's fine
-    #[structopt(hidden = true, possible_values = &["3pl"])]
+    #[clap(hide = true, possible_values = &["3pl"])]
     _cmd: Option<String>,
 }
 
@@ -178,7 +178,7 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
     let packages = find_packages(&opt)?;
 
     if packages.is_empty() {
