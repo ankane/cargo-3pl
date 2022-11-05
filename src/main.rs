@@ -1,4 +1,5 @@
 use clap::{ColorChoice, Parser};
+use clap::builder::PossibleValuesParser;
 use serde_json::Value;
 use std::error::Error;
 use std::ffi::OsStr;
@@ -23,23 +24,23 @@ enum Color {
 
 // try to match output of other cargo commands
 #[derive(Debug, Parser)]
-#[clap(name = "cargo-3pl", about, override_usage = "cargo 3pl [OPTIONS]", version, color = ColorChoice::Never)]
+#[command(name = "cargo-3pl", about, override_usage = "cargo 3pl [OPTIONS]", version, color = ColorChoice::Never)]
 struct Opt {
     /// Space or comma separated list of features to activate
-    #[clap(long, value_name = "FEATURES")]
+    #[arg(long, value_name = "FEATURES")]
     features: Vec<String>,
 
     /// Activate all available features
-    #[clap(long)]
+    #[arg(long)]
     all_features: bool,
 
     /// Do not activate the `default` feature
-    #[clap(long)]
+    #[arg(long)]
     no_default_features: bool,
 
     // cargo passes 3pl
     // this approach allows cargo-3pl 3pl but that's fine
-    #[clap(hide = true, possible_values = &["3pl"])]
+    #[arg(hide = true, value_parser = PossibleValuesParser::new(&["3pl"]))]
     _cmd: Option<String>,
 }
 
