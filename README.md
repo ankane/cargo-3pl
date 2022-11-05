@@ -17,7 +17,7 @@ cargo install cargo-3pl
 As part of your distribution process, run:
 
 ```sh
-cargo 3pl > THIRD-PARTY-LICENSES.txt
+cargo 3pl > LICENSE-THIRD-PARTY
 ```
 
 ## How It Works
@@ -61,14 +61,14 @@ other-package COPYING
 And append it:
 
 ```sh
-cat MANUAL-LICENSES.txt >> THIRD-PARTY-LICENSES.txt
+cat LICENSE-MANUAL >> LICENSE-THIRD-PARTY
 ```
 
 We also recommend creating a pull request for the package.
 
 ## History
 
-View the [changelog](https://github.com/ankane/cargo-3pl/blob/master/CHANGELOG.md)
+View the [changelog](CHANGELOG.md)
 
 ## Contributing
 
