@@ -196,7 +196,7 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
         for path in &package.license_paths {
             let mut file = File::open(path)?;
             let relative_path = path.strip_prefix(&package.path).unwrap().display();
-            print_header(format!("{} {}", package.name, relative_path));
+            print_header(format!("{} v{} {}", package.name, package.version, relative_path));
             io::copy(&mut file, &mut stdout)?;
             println!();
         }
