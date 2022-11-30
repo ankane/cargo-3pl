@@ -39,7 +39,7 @@ cargo 3pl --all-features
 cargo 3pl --no-default-features
 ```
 
-Specify specific target(s)
+Specify targets
 
 ```sh
 cargo 3pl --target x86_64-unknown-linux-gnu
