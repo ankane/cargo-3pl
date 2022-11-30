@@ -39,6 +39,12 @@ cargo 3pl --all-features
 cargo 3pl --no-default-features
 ```
 
+Specify specific target(s)
+
+```sh
+cargo 3pl --target x86_64-unknown-linux-gnu
+```
+
 ## Missing License Files
 
 If any packages are missing license files, create a new file:
