@@ -8,13 +8,23 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command};
 
+struct LicenseFile {
+    path: PathBuf,
+}
+
+impl LicenseFile {
+    fn new(path: PathBuf) -> Self {
+        Self { path }
+    }
+}
+
 struct Package {
     name: String,
     version: String,
     url: Option<String>,
     license: Option<String>,
     path: PathBuf,
-    license_paths: Vec<PathBuf>,
+    license_files: Vec<LicenseFile>,
 }
 
 enum Color {
@@ -73,17 +83,17 @@ fn license_file(path: &Path) -> bool {
     license_filename(&filename) && license_ext(&ext)
 }
 
-fn find_license_files(license_paths: &mut Vec<PathBuf>, dir: &Path) {
+fn find_license_files(license_files: &mut Vec<LicenseFile>, dir: &Path) {
     if dir.is_dir() {
         for entry in fs::read_dir(dir).unwrap() {
             let entry = entry.unwrap();
             let path = entry.path();
             if path.is_dir() {
-                find_license_files(license_paths, &path);
+                find_license_files(license_files, &path);
             } else {
                 let path = entry.path();
                 if license_file(&path) {
-                    license_paths.push(path);
+                    license_files.push(LicenseFile::new(path));
                 }
             }
         }
@@ -147,16 +157,16 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
             continue;
         }
 
-        let mut license_paths = Vec::new();
+        let mut license_files = Vec::new();
         let path = manifest_path.parent().unwrap().to_path_buf();
-        find_license_files(&mut license_paths, &path);
+        find_license_files(&mut license_files, &path);
         if let Some(license_file) = package["license_file"].as_str() {
             let license_path = path.join(license_file);
-            if !license_paths.contains(&license_path) {
-                license_paths.push(license_path);
+            if !license_files.iter().any(|v| v.path == license_path) {
+                license_files.push(LicenseFile::new(license_path));
             }
         }
-        license_paths.sort_unstable();
+        license_files.sort_unstable_by_key(|v| v.path.clone());
 
         packages.push(Package {
             name: package["name"].as_str().unwrap().into(),
@@ -167,7 +177,7 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
                 .map(|v| v.into()),
             license: package["license"].as_str().map(|v| v.into()),
             path,
-            license_paths,
+            license_files,
         })
     }
 
@@ -193,9 +203,9 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
 
     let mut stdout = io::stdout();
     for package in packages {
-        for path in &package.license_paths {
-            let mut file = File::open(path)?;
-            let relative_path = path.strip_prefix(&package.path).unwrap().display();
+        for license_file in &package.license_files {
+            let mut file = File::open(&license_file.path)?;
+            let relative_path = license_file.path.strip_prefix(&package.path).unwrap().display();
             print_header(format!("{} {}", package.name, relative_path));
             io::copy(&mut file, &mut stdout)?;
             println!();
@@ -220,7 +230,7 @@ fn run() -> Result<(), Box<dyn Error>> {
     }
 
     for package in &packages {
-        if package.license_paths.is_empty() {
+        if package.license_files.is_empty() {
             warn(format!("No license files found: {}", package.name));
         }
     }
