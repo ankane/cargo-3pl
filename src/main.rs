@@ -17,6 +17,12 @@ struct Package {
     license_paths: Vec<PathBuf>,
 }
 
+impl Package {
+    fn display_name(&self) -> String {
+        format!("{} v{}", self.name, self.version)
+    }
+}
+
 enum Color {
     Red = 31,
     Yellow = 33,
@@ -196,7 +202,7 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
         for path in &package.license_paths {
             let mut file = File::open(path)?;
             let relative_path = path.strip_prefix(&package.path).unwrap().display();
-            print_header(format!("{} v{} {}", package.name, package.version, relative_path));
+            print_header(format!("{} {}", package.display_name(), relative_path));
             io::copy(&mut file, &mut stdout)?;
             println!();
         }
@@ -215,13 +221,13 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     for package in &packages {
         if package.license.is_none() {
-            warn(format!("No license field: {}", package.name));
+            warn(format!("No license field: {}", package.display_name()));
         }
     }
 
     for package in &packages {
         if package.license_paths.is_empty() {
-            warn(format!("No license files found: {}", package.name));
+            warn(format!("No license files found: {}", package.display_name()));
         }
     }
 
