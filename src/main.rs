@@ -110,7 +110,13 @@ fn get_metadata(opt: &Opt) -> Result<Value, Box<dyn Error>> {
     let output = cmd.output()?;
 
     if !output.status.success() {
-        return Err("cargo metadata failed".into());
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let spec_error = "Error loading target specification: ";
+        if let Some(line) = stderr.lines().find(|v| v.contains(spec_error)) {
+            return Err(line.split(spec_error).last().unwrap().into())
+        } else {
+            return Err(format!("cargo metadata failed\n{}", stderr).into());
+        }
     }
 
     Ok(serde_json::from_slice(&output.stdout)?)
