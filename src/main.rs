@@ -1,5 +1,5 @@
-use clap::{ColorChoice, Parser};
 use clap::builder::PossibleValuesParser;
+use clap::{ColorChoice, Parser};
 use serde_json::Value;
 use std::error::Error;
 use std::ffi::OsStr;
@@ -49,7 +49,10 @@ struct Opt {
 }
 
 fn license_filename(filename: &str) -> bool {
-    filename.contains("license") || filename.contains("licence") || filename.contains("notice") || filename.contains("copying")
+    filename.contains("license")
+        || filename.contains("licence")
+        || filename.contains("notice")
+        || filename.contains("copying")
 }
 
 fn license_ext(ext: &str) -> bool {
@@ -57,8 +60,16 @@ fn license_ext(ext: &str) -> bool {
 }
 
 fn license_file(path: &Path) -> bool {
-    let filename = path.file_stem().unwrap_or_else(|| OsStr::new("")).to_string_lossy().to_lowercase();
-    let ext = path.extension().unwrap_or_else(|| OsStr::new("")).to_string_lossy().to_lowercase();
+    let filename = path
+        .file_stem()
+        .unwrap_or_else(|| OsStr::new(""))
+        .to_string_lossy()
+        .to_lowercase();
+    let ext = path
+        .extension()
+        .unwrap_or_else(|| OsStr::new(""))
+        .to_string_lossy()
+        .to_lowercase();
     license_filename(&filename) && license_ext(&ext)
 }
 
@@ -113,7 +124,7 @@ fn get_metadata(opt: &Opt) -> Result<Value, Box<dyn Error>> {
         let stderr = String::from_utf8_lossy(&output.stderr);
         let spec_error = "Error loading target specification: ";
         if let Some(line) = stderr.lines().find(|v| v.contains(spec_error)) {
-            return Err(line.split(spec_error).last().unwrap().into())
+            return Err(line.split(spec_error).last().unwrap().into());
         } else {
             return Err(format!("cargo metadata failed\n{}", stderr).into());
         }
@@ -150,7 +161,10 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
         packages.push(Package {
             name: package["name"].as_str().unwrap().into(),
             version: package["version"].as_str().unwrap().into(),
-            url: package["homepage"].as_str().or_else(|| package["repository"].as_str()).map(|v| v.into()),
+            url: package["homepage"]
+                .as_str()
+                .or_else(|| package["repository"].as_str())
+                .map(|v| v.into()),
             license: package["license"].as_str().map(|v| v.into()),
             path,
             license_paths,
