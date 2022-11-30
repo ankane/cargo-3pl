@@ -143,7 +143,7 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
 
         // there doesn't appear to be a great way to determine current package
         // https://github.com/rust-lang/cargo/issues/4018
-        if manifest_path.starts_with(&workspace_root) {
+        if manifest_path.starts_with(workspace_root) {
             continue;
         }
 
@@ -194,7 +194,7 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
     let mut stdout = io::stdout();
     for package in packages {
         for path in &package.license_paths {
-            let mut file = File::open(&path)?;
+            let mut file = File::open(path)?;
             let relative_path = path.strip_prefix(&package.path).unwrap().display();
             print_header(format!("{} {}", package.name, relative_path));
             io::copy(&mut file, &mut stdout)?;
