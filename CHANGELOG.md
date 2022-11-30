@@ -1,3 +1,7 @@
+## 0.1.2 (unreleased)
+
+- Added `--target` option
+
 ## 0.1.1 (2021-12-10)
 
 - Changed no `license` field from error to warning

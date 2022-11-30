@@ -38,6 +38,10 @@ struct Opt {
     #[arg(long)]
     no_default_features: bool,
 
+    /// Filter dependencies matching the given target-triple
+    #[arg(long, value_name = "TRIPLE")]
+    target: Vec<String>,
+
     // cargo passes 3pl
     // this approach allows cargo-3pl 3pl but that's fine
     #[arg(hide = true, value_parser = PossibleValuesParser::new(&["3pl"]))]
@@ -98,6 +102,10 @@ fn get_metadata(opt: &Opt) -> Result<Value, Box<dyn Error>> {
     }
     if opt.no_default_features {
         cmd.arg("--no-default-features");
+    }
+    for target in opt.target.iter() {
+        cmd.arg("--filter-platform");
+        cmd.arg(target);
     }
     let output = cmd.output()?;
 
