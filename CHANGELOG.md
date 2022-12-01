@@ -2,7 +2,7 @@
 
 - Added `--require-files` option
 - Added experimental `--source` option
-- Improved output when multiple versions of the same dependency
+- Improved output when multiple versions of the same package
 
 ## 0.1.2 (2022-11-30)
 
