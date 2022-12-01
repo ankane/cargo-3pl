@@ -1,5 +1,5 @@
 use clap::builder::PossibleValuesParser;
-use clap::{ColorChoice, Parser};
+use clap::Parser;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
@@ -51,7 +51,7 @@ enum Color {
 
 // try to match output of other cargo commands
 #[derive(Debug, Parser)]
-#[command(name = "cargo-3pl", about, override_usage = "cargo 3pl [OPTIONS]", version, color = ColorChoice::Never)]
+#[command(name = "cargo-3pl", about, override_usage = "cargo 3pl [OPTIONS]", version)]
 struct Opt {
     /// Space or comma separated list of features to activate
     #[arg(long, value_name = "FEATURES")]

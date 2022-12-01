@@ -22,7 +22,6 @@ jobs:
     - uses: ankane/rust-release@v1
       with:
         target: ${{ matrix.target }}
-        manual-licenses-path: .github/workflows/LICENSE-MANUAL
       id: rust-release
     - uses: actions/upload-artifact@v3
       with:
