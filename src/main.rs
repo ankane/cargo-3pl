@@ -33,10 +33,14 @@ struct Package {
 impl Package {
     fn display_name(&self) -> String {
         if self.multiple_versions {
-            format!("{} v{}", self.name, self.version)
+            self.full_name()
         } else {
             self.name.clone()
         }
+    }
+
+    fn full_name(&self) -> String {
+        format!("{} v{}", self.name, self.version)
     }
 }
 
@@ -271,14 +275,14 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     for package in &packages {
         if package.license.is_none() {
-            warn(format!("No license field: {}", package.display_name()));
+            warn(format!("No license field: {}", package.full_name()));
         }
     }
 
     let mut missing_files = false;
     for package in &packages {
         if package.license_files.is_empty() {
-            warn(format!("No license files found: {}", package.display_name()));
+            warn(format!("No license files found: {}", package.full_name()));
             missing_files = true;
         }
     }
