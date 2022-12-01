@@ -16,7 +16,7 @@ struct LicenseFile {
 
 impl LicenseFile {
     fn new(path: PathBuf, root: &Path) -> Self {
-        let relative_path = path.strip_prefix(&root).unwrap().display().to_string();
+        let relative_path = path.strip_prefix(root).unwrap().display().to_string();
         Self { path, relative_path }
     }
 }
