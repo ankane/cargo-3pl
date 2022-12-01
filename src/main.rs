@@ -64,6 +64,10 @@ struct Opt {
     #[arg(long, value_name = "TRIPLE")]
     target: Vec<String>,
 
+    /// Require all dependencies to have license files
+    #[arg(long)]
+    require_files: bool,
+
     // cargo passes 3pl
     // this approach allows cargo-3pl 3pl but that's fine
     #[arg(hide = true, value_parser = PossibleValuesParser::new(&["3pl"]))]
@@ -251,10 +255,15 @@ fn run() -> Result<(), Box<dyn Error>> {
         }
     }
 
+    let mut missing_files = false;
     for package in &packages {
         if package.license_files.is_empty() {
             warn(format!("No license files found: {}", package.display_name()));
+            missing_files = true;
         }
+    }
+    if opt.require_files && missing_files {
+        return Err("Exiting due to missing license files".into());
     }
 
     print_packages(&packages)
