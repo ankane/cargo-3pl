@@ -1,6 +1,7 @@
 use clap::builder::PossibleValuesParser;
 use clap::{ColorChoice, Parser};
 use serde_json::Value;
+use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::fs::{self, File};
@@ -25,6 +26,17 @@ struct Package {
     license: Option<String>,
     path: PathBuf,
     license_files: Vec<LicenseFile>,
+    multiple_versions: bool,
+}
+
+impl Package {
+    fn display_name(&self) -> String {
+        if self.multiple_versions {
+            format!("{} v{}", self.name, self.version)
+        } else {
+            self.name.clone()
+        }
+    }
 }
 
 enum Color {
@@ -178,7 +190,17 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
             license: package["license"].as_str().map(|v| v.into()),
             path,
             license_files,
+            multiple_versions: false,
         })
+    }
+
+    let mut counts = HashMap::new();
+    for package in &packages {
+        *counts.entry(package.name.clone()).or_insert(0) += 1;
+    }
+
+    for package in &mut packages {
+        package.multiple_versions = counts.get(&package.name).unwrap() > &1;
     }
 
     Ok(packages)
@@ -206,7 +228,7 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
         for license_file in &package.license_files {
             let mut file = File::open(&license_file.path)?;
             let relative_path = license_file.path.strip_prefix(&package.path).unwrap().display();
-            print_header(format!("{} {}", package.name, relative_path));
+            print_header(format!("{} {}", package.display_name(), relative_path));
             io::copy(&mut file, &mut stdout)?;
             println!();
         }
@@ -225,13 +247,13 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     for package in &packages {
         if package.license.is_none() {
-            warn(format!("No license field: {}", package.name));
+            warn(format!("No license field: {}", package.display_name()));
         }
     }
 
     for package in &packages {
         if package.license_files.is_empty() {
-            warn(format!("No license files found: {}", package.name));
+            warn(format!("No license files found: {}", package.display_name()));
         }
     }
 

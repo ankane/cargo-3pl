@@ -1,3 +1,7 @@
+## 0.1.3 (unreleased)
+
+- Improved output when multiple versions of the same dependency
+
 ## 0.1.2 (2022-11-30)
 
 - Added `--target` option
