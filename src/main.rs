@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::fs::{self, File};
-use std::io;
+use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{self, Command};
 
@@ -211,12 +211,13 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
 }
 
 fn print_header(header: String) {
-    println!("{}\n{}\n{}\n", "=".repeat(80), header, "=".repeat(80));
+    println!("{}\n{}\n{}", "=".repeat(80), header, "=".repeat(80));
 }
 
 fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
     print_header("Summary".into());
     for package in packages {
+        println!();
         println!("{} v{}", package.name, package.version);
         if let Some(url) = &package.url {
             println!("{}", url);
@@ -224,7 +225,6 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
         if let Some(license) = &package.license {
             println!("{}", license);
         }
-        println!();
     }
 
     let mut stdout = io::stdout();
@@ -232,8 +232,21 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
         for license_file in &package.license_files {
             let mut file = File::open(&license_file.path)?;
             let relative_path = license_file.path.strip_prefix(&package.path).unwrap().display();
+            println!();
             print_header(format!("{} {}", package.display_name(), relative_path));
-            io::copy(&mut file, &mut stdout)?;
+            println!();
+            let mut buffer = Vec::new();
+            file.read_to_end(&mut buffer)?;
+            // ensure consistent spacing between licenses
+            while let Some(v) = buffer.last() {
+                // remove trailing whitespace
+                if v == &9 || v == &10 || v == &32 {
+                    buffer.truncate(buffer.len() - 1);
+                } else {
+                    break;
+                }
+            }
+            stdout.write_all(&buffer)?;
             println!();
         }
     }
