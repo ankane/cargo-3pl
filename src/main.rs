@@ -77,6 +77,10 @@ struct Opt {
     #[arg(long, value_name = "PATH")]
     source: Option<PathBuf>,
 
+    /// Show the package url (experimental)
+    #[arg(hide = true, long)]
+    show_url: bool,
+
     // cargo passes 3pl
     // this approach allows cargo-3pl 3pl but that's fine
     #[arg(hide = true, value_parser = PossibleValuesParser::new(&["3pl"]))]
@@ -282,7 +286,13 @@ fn run() -> Result<(), Box<dyn Error>> {
     let mut missing_files = false;
     for package in &packages {
         if package.license_files.is_empty() {
-            warn(format!("No license files found: {}", package.full_name()));
+            let mut suffix = "".into();
+            if opt.show_url {
+                if let Some(url) = &package.url {
+                    suffix = format!(" ({})", url);
+                }
+            };
+            warn(format!("No license files found: {}{}", package.full_name(), suffix));
             missing_files = true;
         }
     }
