@@ -11,11 +11,13 @@ use std::process::{self, Command};
 
 struct LicenseFile {
     path: PathBuf,
+    relative_path: String,
 }
 
 impl LicenseFile {
-    fn new(path: PathBuf) -> Self {
-        Self { path }
+    fn new(path: PathBuf, root: &Path) -> Self {
+        let relative_path = path.strip_prefix(&root).unwrap().display().to_string();
+        Self { path, relative_path }
     }
 }
 
@@ -24,7 +26,6 @@ struct Package {
     version: String,
     url: Option<String>,
     license: Option<String>,
-    path: PathBuf,
     license_files: Vec<LicenseFile>,
     multiple_versions: bool,
 }
@@ -68,6 +69,10 @@ struct Opt {
     #[arg(long)]
     require_files: bool,
 
+    /// Path for license files (experimental)
+    #[arg(long, value_name = "PATH")]
+    source: Option<PathBuf>,
+
     // cargo passes 3pl
     // this approach allows cargo-3pl 3pl but that's fine
     #[arg(hide = true, value_parser = PossibleValuesParser::new(&["3pl"]))]
@@ -99,17 +104,17 @@ fn license_file(path: &Path) -> bool {
     license_filename(&filename) && license_ext(&ext)
 }
 
-fn find_license_files(license_files: &mut Vec<LicenseFile>, dir: &Path) {
+fn find_license_files(license_files: &mut Vec<LicenseFile>, dir: &Path, root: &Path, all: bool) {
     if dir.is_dir() {
         for entry in fs::read_dir(dir).unwrap() {
             let entry = entry.unwrap();
             let path = entry.path();
             if path.is_dir() {
-                find_license_files(license_files, &path);
+                find_license_files(license_files, &path, root, all);
             } else {
                 let path = entry.path();
-                if license_file(&path) {
-                    license_files.push(LicenseFile::new(path));
+                if all || license_file(&path) {
+                    license_files.push(LicenseFile::new(path, root));
                 }
             }
         }
@@ -173,26 +178,32 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
             continue;
         }
 
+        let name = package["name"].as_str().unwrap().into();
+        let version = package["version"].as_str().unwrap().into();
+
         let mut license_files = Vec::new();
         let path = manifest_path.parent().unwrap().to_path_buf();
-        find_license_files(&mut license_files, &path);
+        find_license_files(&mut license_files, &path, &path, false);
         if let Some(license_file) = package["license_file"].as_str() {
             let license_path = path.join(license_file);
             if !license_files.iter().any(|v| v.path == license_path) {
-                license_files.push(LicenseFile::new(license_path));
+                license_files.push(LicenseFile::new(license_path, &path));
             }
         }
         license_files.sort_unstable_by_key(|v| v.path.clone());
+        if let Some(source) = &opt.source {
+            let s = source.join(format!("{}-{}", name, version));
+            find_license_files(&mut license_files, &s, &s, true);
+        }
 
         packages.push(Package {
-            name: package["name"].as_str().unwrap().into(),
-            version: package["version"].as_str().unwrap().into(),
+            name,
+            version,
             url: package["homepage"]
                 .as_str()
                 .or_else(|| package["repository"].as_str())
                 .map(|v| v.into()),
             license: package["license"].as_str().map(|v| v.into()),
-            path,
             license_files,
             multiple_versions: false,
         })
@@ -231,9 +242,8 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
     for package in packages {
         for license_file in &package.license_files {
             let mut file = File::open(&license_file.path)?;
-            let relative_path = license_file.path.strip_prefix(&package.path).unwrap().display();
             println!();
-            print_header(format!("{} {}", package.display_name(), relative_path));
+            print_header(format!("{} {}", package.display_name(), license_file.relative_path));
             println!();
             let mut buffer = Vec::new();
             file.read_to_end(&mut buffer)?;

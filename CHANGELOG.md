@@ -1,6 +1,7 @@
 ## 0.1.3 (unreleased)
 
 - Added `--require-files` option
+- Added experimental `--source` option
 - Improved output when multiple versions of the same dependency
 
 ## 0.1.2 (2022-11-30)
