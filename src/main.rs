@@ -247,17 +247,14 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
             println!();
             let mut buffer = Vec::new();
             file.read_to_end(&mut buffer)?;
+            stdout.write_all(&buffer)?;
+
             // ensure consistent spacing between licenses
-            while let Some(v) = buffer.last() {
-                // remove trailing whitespace
-                if v == &9 || v == &10 || v == &32 {
-                    buffer.truncate(buffer.len() - 1);
-                } else {
-                    break;
+            if let Some(v) = buffer.last() {
+                if v != &10 {
+                    println!();
                 }
             }
-            stdout.write_all(&buffer)?;
-            println!();
         }
     }
 
