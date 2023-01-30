@@ -1,4 +1,4 @@
-## 0.1.3 (unreleased)
+## 0.1.3 (2023-01-29)
 
 - Added `--require-files` option
 - Added experimental `--source` option

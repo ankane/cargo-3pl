@@ -1,6 +1,6 @@
 [package]
 name = "cargo-3pl"
-version = "0.1.2"
+version = "0.1.3"
 description = "The easy way to ship dependency licenses with your Rust binaries"
 repository = "https://github.com/ankane/cargo-3pl"
 license = "MIT OR Apache-2.0"
