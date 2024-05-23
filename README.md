@@ -2,7 +2,7 @@
 
 :truck: The easy way to ship dependency licenses with your Rust binaries
 
-[![Build Status](https://github.com/ankane/cargo-3pl/workflows/build/badge.svg?branch=master)](https://github.com/ankane/cargo-3pl/actions)
+[![Build Status](https://github.com/ankane/cargo-3pl/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/cargo-3pl/actions)
 
 ## Installation
 
