@@ -17,7 +17,10 @@ struct LicenseFile {
 impl LicenseFile {
     fn new(path: PathBuf, root: &Path) -> Self {
         let relative_path = path.strip_prefix(root).unwrap().display().to_string();
-        Self { path, relative_path }
+        Self {
+            path,
+            relative_path,
+        }
     }
 }
 
@@ -51,7 +54,12 @@ enum Color {
 
 // try to match output of other cargo commands
 #[derive(Debug, Parser)]
-#[command(name = "cargo-3pl", about, override_usage = "cargo 3pl [OPTIONS]", version)]
+#[command(
+    name = "cargo-3pl",
+    about,
+    override_usage = "cargo 3pl [OPTIONS]",
+    version
+)]
 struct Opt {
     /// Space or comma separated list of features to activate
     #[arg(long, value_name = "FEATURES")]
@@ -251,7 +259,11 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
         for license_file in &package.license_files {
             let mut file = File::open(&license_file.path)?;
             println!();
-            print_header(format!("{} {}", package.display_name(), license_file.relative_path));
+            print_header(format!(
+                "{} {}",
+                package.display_name(),
+                license_file.relative_path
+            ));
             println!();
             let mut buffer = Vec::new();
             file.read_to_end(&mut buffer)?;
@@ -292,7 +304,11 @@ fn run() -> Result<(), Box<dyn Error>> {
                     suffix = format!(" ({})", url);
                 }
             };
-            warn(format!("No license files found: {}{}", package.full_name(), suffix));
+            warn(format!(
+                "No license files found: {}{}",
+                package.full_name(),
+                suffix
+            ));
             missing_files = true;
         }
     }
