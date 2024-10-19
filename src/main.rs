@@ -138,11 +138,11 @@ fn find_license_files(license_files: &mut Vec<LicenseFile>, dir: &Path, root: &P
 }
 
 // TODO use atty to detect tty
-fn colorize(message: String, color: Color) -> String {
+fn colorize(message: &str, color: Color) -> String {
     format!("\x1b[{}m{}\x1b[0m", color as u8, message)
 }
 
-fn warn(message: String) {
+fn warn(message: &str) {
     eprintln!("{}", colorize(message, Color::Yellow));
 }
 
@@ -222,7 +222,7 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
             license: package["license"].as_str().map(|v| v.into()),
             license_files,
             multiple_versions: false,
-        })
+        });
     }
 
     let mut counts = HashMap::new();
@@ -237,12 +237,12 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
     Ok(packages)
 }
 
-fn print_header(header: String) {
+fn print_header(header: &str) {
     println!("{}\n{}\n{}", "=".repeat(80), header, "=".repeat(80));
 }
 
 fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
-    print_header("Summary".into());
+    print_header("Summary");
     for package in packages {
         println!();
         println!("{} v{}", package.name, package.version);
@@ -259,7 +259,7 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
         for license_file in &package.license_files {
             let mut file = File::open(&license_file.path)?;
             println!();
-            print_header(format!(
+            print_header(&format!(
                 "{} {}",
                 package.display_name(),
                 license_file.relative_path
@@ -291,7 +291,7 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     for package in &packages {
         if package.license.is_none() {
-            warn(format!("No license field: {}", package.full_name()));
+            warn(&format!("No license field: {}", package.full_name()));
         }
     }
 
@@ -304,7 +304,7 @@ fn run() -> Result<(), Box<dyn Error>> {
                     suffix = format!(" ({})", url);
                 }
             };
-            warn(format!(
+            warn(&format!(
                 "No license files found: {}{}",
                 package.full_name(),
                 suffix
@@ -321,7 +321,7 @@ fn run() -> Result<(), Box<dyn Error>> {
 
 fn main() {
     if let Err(err) = run() {
-        eprintln!("{}", colorize(err.to_string(), Color::Red));
+        eprintln!("{}", colorize(&err.to_string(), Color::Red));
         process::exit(1);
     }
 }
