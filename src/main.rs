@@ -161,7 +161,7 @@ fn get_metadata(opt: &Opt) -> Result<Value, Box<dyn Error>> {
     if opt.no_default_features {
         cmd.arg("--no-default-features");
     }
-    for target in opt.target.iter() {
+    for target in &opt.target {
         cmd.arg("--filter-platform");
         cmd.arg(target);
     }
