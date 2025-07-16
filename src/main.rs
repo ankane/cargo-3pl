@@ -173,7 +173,7 @@ fn get_metadata(opt: &Opt) -> Result<Value, Box<dyn Error>> {
         if let Some(line) = stderr.lines().find(|v| v.contains(spec_error)) {
             return Err(line.split(spec_error).last().unwrap().into());
         } else {
-            return Err(format!("cargo metadata failed\n{}", stderr).into());
+            return Err(format!("cargo metadata failed\n{stderr}").into());
         }
     }
 
@@ -208,7 +208,7 @@ fn find_packages(opt: &Opt) -> Result<Vec<Package>, Box<dyn Error>> {
         }
         license_files.sort_unstable_by_key(|v| v.path.clone());
         if let Some(source) = &opt.source {
-            let s = source.join(format!("{}-{}", name, version));
+            let s = source.join(format!("{name}-{version}"));
             find_license_files(&mut license_files, &s, &s, true);
         }
 
@@ -247,10 +247,10 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
         println!();
         println!("{} v{}", package.name, package.version);
         if let Some(url) = &package.url {
-            println!("{}", url);
+            println!("{url}");
         }
         if let Some(license) = &package.license {
-            println!("{}", license);
+            println!("{license}");
         }
     }
 
@@ -301,7 +301,7 @@ fn run() -> Result<(), Box<dyn Error>> {
             let mut suffix = "".into();
             if opt.show_url {
                 if let Some(url) = &package.url {
-                    suffix = format!(" ({})", url);
+                    suffix = format!(" ({url})");
                 }
             };
             warn(&format!(
