@@ -1,3 +1,6 @@
+#![doc = include_str!("../README.md")]
+#![allow(clippy::needless_doctest_main)]
+
 use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
