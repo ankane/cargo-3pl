@@ -47,30 +47,18 @@ cargo 3pl --target x86_64-unknown-linux-gnu
 
 ## Missing License Files
 
-If any packages are missing license files, create a new file:
-
-```text
-
-================================================================================
-some-package LICENSE.txt
-================================================================================
-
-...
-
-================================================================================
-other-package COPYING
-================================================================================
-
-...
-```
-
-And append it:
+If any packages are missing license files, create a directory for licenses:
 
 ```sh
-cat LICENSE-MANUAL >> LICENSE-THIRD-PARTY
+mkdir -p 3pl-source/some-crate-0.1.0
+cp /path/to/some-crate/LICENSE 3pl-source/some-crate-0.1.0
 ```
 
-We also recommend creating a pull request for the package.
+And use:
+
+```sh
+cargo 3pl --source 3pl-source
+```
 
 ## History
 
