@@ -275,10 +275,10 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
             stdout.write_all(&buffer)?;
 
             // ensure consistent spacing between licenses
-            if let Some(v) = buffer.last() {
-                if v != &10 {
-                    println!();
-                }
+            if let Some(v) = buffer.last()
+                && v != &10
+            {
+                println!();
             }
         }
     }
@@ -304,10 +304,10 @@ fn run() -> Result<(), Box<dyn Error>> {
     for package in &packages {
         if package.license_files.is_empty() {
             let mut suffix = "".into();
-            if opt.show_url {
-                if let Some(url) = &package.url {
-                    suffix = format!(" ({url})");
-                }
+            if opt.show_url
+                && let Some(url) = &package.url
+            {
+                suffix = format!(" ({url})");
             };
             warn(&format!(
                 "No license files found: {}{}",
