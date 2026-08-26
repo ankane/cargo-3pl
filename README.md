@@ -47,11 +47,11 @@ cargo 3pl --target x86_64-unknown-linux-gnu
 
 ## Missing License Files
 
-If any packages are missing license files, create a directory for licenses:
+If any crates are missing license files, create a directory for licenses:
 
 ```sh
-mkdir -p 3pl-source/some-package-0.1.0
-cp /path/to/some-package/LICENSE 3pl-source/some-package-0.1.0
+mkdir -p 3pl-source/some-crate-0.1.0
+cp /path/to/some-crate/LICENSE 3pl-source/some-crate-0.1.0
 ```
 
 And use:
