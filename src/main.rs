@@ -1,5 +1,3 @@
-use clap::Parser;
-use clap::builder::PossibleValuesParser;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
@@ -52,47 +50,15 @@ enum Color {
     Yellow = 33,
 }
 
-// try to match output of other cargo commands
-#[derive(Debug, Parser)]
-#[command(
-    name = "cargo-3pl",
-    about,
-    override_usage = "cargo 3pl [OPTIONS]",
-    version
-)]
+#[derive(Debug, Default)]
 struct Opt {
-    /// Space or comma separated list of features to activate
-    #[arg(long, value_name = "FEATURES")]
     features: Vec<String>,
-
-    /// Activate all available features
-    #[arg(long)]
     all_features: bool,
-
-    /// Do not activate the `default` feature
-    #[arg(long)]
     no_default_features: bool,
-
-    /// Filter dependencies matching the given target-triple
-    #[arg(long, value_name = "TRIPLE")]
     target: Vec<String>,
-
-    /// Require all dependencies to have license files
-    #[arg(long)]
     require_files: bool,
-
-    /// Path for license files (experimental)
-    #[arg(long, value_name = "PATH")]
     source: Option<PathBuf>,
-
-    /// Show the package url (experimental)
-    #[arg(hide = true, long)]
     show_url: bool,
-
-    // cargo passes 3pl
-    // this approach allows cargo-3pl 3pl but that's fine
-    #[arg(hide = true, value_parser = PossibleValuesParser::new(&["3pl"]))]
-    _cmd: Option<String>,
 }
 
 fn license_filename(filename: &str) -> bool {
@@ -286,8 +252,101 @@ fn print_packages(packages: &[Package]) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn parse_opt_error(error: &str) {
+    eprintln!("error: {}\n\nFor more information, try '--help'.", error);
+    process::exit(1);
+}
+
+fn parse_opt() -> Opt {
+    let mut args = std::env::args().skip(1).peekable();
+    let mut opt = Opt::default();
+
+    // cargo passes 3pl
+    if let Some(arg) = args.peek() {
+        if arg.as_str() == "3pl" {
+            args.next();
+        }
+    }
+
+    while let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--features" => {
+                if let Some(feature) = args.next() {
+                    opt.features.push(feature);
+                } else {
+                    parse_opt_error(
+                        "a value is required for '--features <FEATURES>' but none was supplied",
+                    );
+                }
+            }
+            "--all-features" => {
+                opt.all_features = true;
+            }
+            "--no-default-features" => {
+                opt.no_default_features = true;
+            }
+            "--target" => {
+                if let Some(target) = args.next() {
+                    opt.target.push(target);
+                } else {
+                    parse_opt_error(
+                        "a value is required for '--target <TRIPLE>' but none was supplied",
+                    );
+                }
+            }
+            "--require-files" => {
+                opt.require_files = true;
+            }
+            "--source" => {
+                if let Some(source) = args.next() {
+                    if !opt.source.is_none() {
+                        parse_opt_error(
+                            "the argument '--source <PATH>' cannot be used multiple times",
+                        );
+                    }
+                    opt.source = Some(source.into());
+                } else {
+                    parse_opt_error(
+                        "a value is required for '--source <PATH>' but none was supplied",
+                    );
+                }
+            }
+            "--show-url" => {
+                opt.show_url = true;
+            }
+            "-V" | "--version" => {
+                println!("cargo-3pl {}", env!("CARGO_PKG_VERSION"));
+                process::exit(0);
+            }
+            "-h" | "--help" => {
+                println!(
+                    "The easy way to ship dependency licenses with your Rust binaries
+
+Usage: cargo 3pl [OPTIONS]
+
+Options:
+      --features <FEATURES>  Space or comma separated list of features to activate
+      --all-features         Activate all available features
+      --no-default-features  Do not activate the `default` feature
+      --target <TRIPLE>      Filter dependencies matching the given target-triple
+      --require-files        Require all dependencies to have license files
+      --source <PATH>        Path for license files (experimental)
+  -h, --help                 Print help
+  -V, --version              Print version"
+                );
+                process::exit(0);
+            }
+            _ => {
+                parse_opt_error(format!("unexpected argument '{}' found", arg).as_str());
+            }
+        }
+    }
+
+    opt
+}
+
 fn run() -> Result<(), Box<dyn Error>> {
-    let opt = Opt::parse();
+    let opt = parse_opt();
     let packages = find_packages(&opt)?;
 
     if packages.is_empty() {
