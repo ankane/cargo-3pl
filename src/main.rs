@@ -108,7 +108,7 @@ fn license_dir(path: &Path) -> bool {
 }
 
 fn license_ext(ext: &str) -> bool {
-    ext.is_empty() || ext == "txt" || ext == "md"
+    ext.is_empty() || ext == "txt" || ext == "md" || ext == "lesser"
 }
 
 fn license_file(path: &Path) -> bool {
