@@ -1,6 +1,6 @@
 # Cargo 3PL
 
-:truck: The easy way to ship dependency licenses with your Rust binaries
+🚚 The easy way to ship dependency licenses with your Rust binaries
 
 [![Build Status](https://github.com/ankane/cargo-3pl/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/cargo-3pl/actions)
 
@@ -74,7 +74,7 @@ We also recommend creating a pull request for the package.
 
 ## History
 
-View the [changelog](CHANGELOG.md)
+View the [changelog](https://github.com/ankane/cargo-3pl/blob/master/CHANGELOG.md)
 
 ## Contributing
 
