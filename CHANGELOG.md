@@ -1,4 +1,4 @@
-## 0.2.0 (unreleased)
+## 0.2.0 (2026-08-26)
 
 - Added support for `LESSER` extension
 - Added support for REUSE spec
