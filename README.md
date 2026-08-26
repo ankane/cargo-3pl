@@ -60,6 +60,8 @@ And use:
 cargo 3pl --source 3pl-source
 ```
 
+See an [example](https://github.com/ankane/3pl-source)
+
 ## History
 
 View the [changelog](https://github.com/ankane/cargo-3pl/blob/master/CHANGELOG.md)
