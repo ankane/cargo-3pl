@@ -5,7 +5,7 @@ description = "The easy way to ship dependency licenses with your Rust binaries"
 repository = "https://github.com/ankane/cargo-3pl"
 license = "MIT OR Apache-2.0"
 authors = ["Andrew Kane <andrew@ankane.org>"]
-edition = "2018"
+edition = "2024"
 readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
