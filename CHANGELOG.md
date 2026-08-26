@@ -2,6 +2,7 @@
 
 - Added support for `LESSER` extension
 - Added support for REUSE spec
+- Updated Rust edition to 2024
 
 ## 0.1.3 (2023-01-29)
 
