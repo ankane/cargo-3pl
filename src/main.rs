@@ -102,6 +102,11 @@ fn license_filename(filename: &str) -> bool {
         || filename.contains("copying")
 }
 
+fn license_dir(path: &Path) -> bool {
+    // REUSE spec
+    path.iter().any(|v| v == "LICENSES")
+}
+
 fn license_ext(ext: &str) -> bool {
     ext.is_empty() || ext == "txt" || ext == "md"
 }
@@ -117,7 +122,7 @@ fn license_file(path: &Path) -> bool {
         .unwrap_or_else(|| OsStr::new(""))
         .to_string_lossy()
         .to_lowercase();
-    license_filename(&filename) && license_ext(&ext)
+    (license_filename(&filename) || license_dir(path)) && license_ext(&ext)
 }
 
 fn find_license_files(license_files: &mut Vec<LicenseFile>, dir: &Path, root: &Path, all: bool) {

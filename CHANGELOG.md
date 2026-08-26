@@ -1,3 +1,7 @@
+## 0.2.0 (unreleased)
+
+- Added support for REUSE spec
+
 ## 0.1.3 (2023-01-29)
 
 - Added `--require-files` option
